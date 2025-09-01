@@ -20,8 +20,7 @@ csi_install(){
     parse_version
     echo "Deploy Version: $deploy_k8s_version"
 
-    kubectl create ns synology-csi
-    kubectl create secret -n synology-csi generic client-info-secret --from-file="$config_file"
+    kubectl create secret -n kube-system generic client-info-secret --from-file="$config_file"
 
     if [ ! -d "$plugin_dir" ]; then
         mkdir -p $plugin_dir

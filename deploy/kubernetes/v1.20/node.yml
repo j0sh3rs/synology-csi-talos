@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: csi-node-sa
-  namespace: synology-csi
+  namespace: kube-system
 
 ---
 kind: ClusterRole
@@ -31,11 +31,11 @@ kind: ClusterRoleBinding
 apiVersion: rbac.authorization.k8s.io/v1
 metadata:
   name: synology-csi-node-role
-  namespace: synology-csi
+  namespace: kube-system
 subjects:
   - kind: ServiceAccount
     name: csi-node-sa
-    namespace: synology-csi
+    namespace: kube-system
 roleRef:
   kind: ClusterRole
   name: synology-csi-node-role
@@ -46,7 +46,9 @@ kind: DaemonSet
 apiVersion: apps/v1
 metadata:
   name: synology-csi-node
-  namespace: synology-csi
+  namespace: kube-system
+  annotations:
+    reloader.stakater.com/auto: "true"
 spec:
   selector:
     matchLabels:
@@ -55,6 +57,8 @@ spec:
     metadata:
       labels:
         app: synology-csi-node
+      annotations:
+        reloader.stakater.com/auto: "true"
     spec:
       hostPID: true
       serviceAccount: csi-node-sa
@@ -67,7 +71,7 @@ spec:
           image: registry.k8s.io/sig-storage/csi-node-driver-registrar:v2.3.0
           args:
             - --v=5
-            - --csi-address=$(ADDRESS)                         # the csi socket path inside the pod
+            - --csi-address=$(ADDRESS) # the csi socket path inside the pod
             - --kubelet-registration-path=$(REGISTRATION_PATH) # the csi socket path on the host node
           env:
             - name: ADDRESS

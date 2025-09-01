@@ -1,0 +1,44 @@
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: test-claim
+spec:
+  storageClassName: synology-iscsi
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 50G
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: write
+spec:
+  template:
+    metadata:
+      name: write
+      labels:
+        app: speedtest
+        job: write
+    spec:
+      containers:
+        - name: write
+          image: ubuntu:xenial
+          command:
+            [
+              "dd",
+              "if=/dev/zero",
+              "of=/mnt/pv/test.img",
+              "bs=1G",
+              "count=40",
+              "oflag=dsync",
+            ]
+          volumeMounts:
+            - mountPath: "/mnt/pv"
+              name: test-volume
+      volumes:
+        - name: test-volume
+          persistentVolumeClaim:
+            claimName: test-claim
+      restartPolicy: Never
