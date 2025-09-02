@@ -10,6 +10,6 @@ parameters:
   location: "/volume1"
   protocol: iscsi
   csi.storage.k8s.io/fstype: ext4
-  formatOptions: "--discard -E lazy_itable_init"
+  formatOptions: "-E lazy_itable_init"
 reclaimPolicy: Retain
 allowVolumeExpansion: true
