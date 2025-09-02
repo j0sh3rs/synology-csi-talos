@@ -3,12 +3,13 @@ kind: StorageClass
 metadata:
   name: synology-iscsi
   annotations:
-    storageclass.kubernetes.io/is-default-class: "false"
+    storageclass.kubernetes.io/is-default-class: "true"
 provisioner: csi.san.synology.com
 parameters:
   dsm: "192.168.35.5"
   location: "/volume1"
   protocol: iscsi
   csi.storage.k8s.io/fstype: ext4
-reclaimPolicy: Delete
+  formatOptions: "--discard -E lazy_itable_init"
+reclaimPolicy: Retain
 allowVolumeExpansion: true
